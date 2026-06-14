@@ -3,158 +3,131 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Penalty Pay App 🏆</title>
-    
-    <!-- TAGS PARA VIRAR APLICATIVO NO CELULAR -->
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="PenaltyPay">
-    <meta name="mobile-web-app-capable" content="yes">
-    <link rel="apple-touch-icon" href="https://penaltypay.com.br/logo.png">
-
+    <title>Penalty Pay App | GaMonix 🏆</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
             background: radial-gradient(circle at center, #004d40 0%, #00251a 100%);
-            color: white;
-            display: flex;
-            justify-content: center;
-            min-height: 100vh;
-            padding: 10px;
+            color: white; display: flex; justify-content: center; min-height: 100vh; padding: 10px;
         }
 
         .game-container {
-            text-align: center;
-            background: #001a33;
-            padding: 15px;
-            border-radius: 20px;
-            border: 4px solid #ffdf00;
-            width: 100%;
-            max-width: 900px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            text-align: center; background: #001a33; padding: 15px; border-radius: 20px;
+            border: 4px solid #ffdf00; width: 100%; max-width: 900px; box-shadow: 0 20px 60px rgba(0,0,0,0.9);
         }
 
-        .stats-panel {
-            background: rgba(0,0,0,0.7);
-            padding: 15px;
-            border-radius: 15px;
-            border: 2px solid #2ecc71;
-            margin-bottom: 15px;
-            display: flex;
-            justify-content: space-around;
-            font-weight: 900;
-            font-size: 22px;
+        /* PLACAR LUMINOSO */
+        .scoreboard {
+            background: #000; border: 2px solid #555; border-radius: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 10px 20px; margin-bottom: 10px; box-shadow: inset 0 0 15px rgba(255,255,255,0.1);
         }
+        .team-box { display: flex; align-items: center; gap: 10px; width: 35%; }
+        .team-name { font-weight: 900; font-size: 14px; letter-spacing: 1px; }
+        .score-num { 
+            background: #222; color: #ffdf00; padding: 5px 12px; border-radius: 5px;
+            font-size: 24px; font-family: 'Courier New', Courier, monospace; border: 1px solid #444;
+        }
+        .match-time { font-size: 12px; color: #aaa; font-weight: bold; }
+
+        .mode-toggle {
+            background: #2ecc71; color: white; border: none; padding: 10px 20px;
+            border-radius: 30px; font-weight: 900; cursor: pointer; margin-bottom: 15px;
+            box-shadow: 0 4px #1b5e20;
+        }
+        .mode-toggle.paid { background: #e74c3c; box-shadow: 0 4px #922b21; }
 
         .field {
             background: #2e7d32;
-            background-image: 
-                repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 50px, transparent 50px, transparent 100px),
-                radial-gradient(circle at 50% 50%, rgba(255,255,255,0.05) 1px, transparent 1px);
-            background-size: 100% 100px, 4px 4px;
-            height: 420px;
-            position: relative;
-            border: 4px solid rgba(255,255,255,0.9);
-            border-radius: 10px;
-            overflow: hidden;
-            box-shadow: inset 0 0 80px rgba(0,0,0,0.6);
+            background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 50px, transparent 50px, transparent 100px);
+            height: 400px; position: relative; border: 4px solid white; border-radius: 10px; overflow: hidden;
         }
 
+        .stadium-stands {
+            position: absolute; top: 0; left: 0; width: 100%; height: 50px;
+            background: #1a1a1a; display: flex; justify-content: center; gap: 4px; padding-top: 10px;
+        }
+        .fan { width: 12px; height: 18px; border-radius: 6px 6px 0 0; background: #ffdf00; }
+        .fan:nth-child(even) { background: #2ecc71; }
+        @keyframes jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .celebrate .fan { animation: jump 0.4s infinite; }
+
         .goal {
-            width: 70%; height: 130px; border: 8px solid white; border-bottom: none;
-            position: absolute; top: 5px; left: 50%; transform: translateX(-50%);
-            background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
-            background-size: 12px 12px;
-            background-color: rgba(255,255,255,0.05);
-            z-index: 2;
+            width: 70%; height: 120px; border: 6px solid white; border-bottom: none;
+            position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
+            background-image: linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px);
+            background-size: 10px 10px; z-index: 2;
         }
 
         .goalkeeper {
-            position: absolute; top: 90px; left: 50%; transform: translate(-50%, -50%);
-            width: 65px; height: 100px; transition: all 0.3s ease; z-index: 10;
+            position: absolute; top: 135px; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 90px; transition: all 0.3s ease; z-index: 10;
         }
-        .gk-head { width: 28px; height: 28px; background: radial-gradient(circle at 30% 30%, #ffe0bd, #8d5524); border-radius: 50%; margin: 0 auto; }
-        .gk-body { width: 45px; height: 60px; background: linear-gradient(90deg, #74b9ff 0%, #ffffff 50%, #74b9ff 100%); margin: -5px auto 0; border-radius: 10px; }
-
-        .player {
-            position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
-            width: 75px; height: 115px; z-index: 20; transition: transform 0.2s;
-        }
-        .pl-head { width: 30px; height: 30px; background: radial-gradient(circle at 30% 30%, #ffe0bd, #8d5524); border-radius: 50%; margin: 0 auto; }
-        .pl-body { width: 48px; height: 65px; background: radial-gradient(circle at 50% 0%, #fed330, #f1c40f); margin: -5px auto 0; border-radius: 12px; }
+        .gk-body { width: 40px; height: 55px; background: linear-gradient(90deg, #74b9ff, #fff); margin: 0 auto; border-radius: 8px; }
 
         .ball {
-            width: 40px; height: 40px; background: white; border-radius: 50%; position: absolute;
-            bottom: 50px; left: 50%; transform: translateX(-50%);
-            background: radial-gradient(circle at 30% 30%, #fff, #888);
-            box-shadow: 0 12px 25px rgba(0,0,0,0.7); z-index: 15;
-            transition: all 0.5s ease-out;
+            width: 35px; height: 35px; background: white; border-radius: 50%; position: absolute;
+            bottom: 40px; left: 50%; transform: translateX(-50%);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 15; transition: all 0.5s ease-out;
         }
 
-        .controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
         .controls button {
-            background: linear-gradient(#ffdf00, #d4ac0d); border: none; padding: 25px 5px;
-            border-radius: 18px; font-weight: 900; color: #001a33; cursor: pointer;
-            box-shadow: 0 7px 0 #997d00; font-size: 16px;
+            background: linear-gradient(#ffdf00, #d4ac0d); border: none; padding: 18px 5px;
+            border-radius: 15px; font-weight: 900; cursor: pointer; box-shadow: 0 5px #997d00;
         }
 
-        .bonus-btn {
-            width: 100%; padding: 22px; background: linear-gradient(45deg, #00c853, #b2ff59);
-            color: white; border: none; border-radius: 18px; font-weight: 900;
-            margin-top: 20px; cursor: pointer; animation: pulse 1.5s infinite; font-size: 22px;
-        }
-        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.03); } }
+        .footer-credits { margin-top: 25px; padding: 15px; font-size: 13px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); }
+        .footer-credits strong { color: #ffdf00; }
 
         #start-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.98); z-index: 5000; display: flex;
-            flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            background: rgba(0,0,0,0.98); z-index: 5000; display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
-
-        /* ESTILO DO RODAPÉ */
-        .footer-credits {
-            margin-top: 30px;
-            padding: 15px;
-            font-size: 13px;
-            color: #aaa;
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        .footer-credits strong { color: #ffdf00; }
     </style>
 </head>
 <body>
 
     <div id="start-overlay">
-        <h1 style="color:#ffdf00; font-size: 50px; margin-bottom: 10px;">PENALTY PAY 🏆</h1>
-        <p style="color:white; margin-bottom: 30px; font-size: 20px;">O Jogo que paga em LTC</p>
-        <button onclick="startGame()" style="background:#2ecc71; color:white; padding:25px 80px; border:none; border-radius:60px; font-weight:900; cursor:pointer; font-size:28px; box-shadow: 0 12px #1b5e20;">JOGAR AGORA! ⚽</button>
+        <h1 style="color:#ffdf00; font-size: 45px;">PENALTY PAY 🏆</h1>
+        <button onclick="startGame()" style="background:#2ecc71; color:white; padding:20px 60px; border:none; border-radius:50px; font-weight:900; cursor:pointer; font-size:24px; margin-top:20px;">COMEÇAR PARTIDA! ⚽</button>
     </div>
 
     <div class="game-container">
-        <div class="stats-panel">
-            <span>⚽ GOLS: <span id="goals">0</span></span>
-            <span style="color:#ff4444;">❤️ VIDAS: <span id="lives">5</span></span>
+        <!-- PLACAR OFICIAL -->
+        <div class="scoreboard">
+            <div class="team-box">
+                <span style="font-size: 24px;">🇧🇷</span>
+                <span class="team-name">BRA</span>
+                <span id="score-bra" class="score-num">0</span>
+            </div>
+            <div class="match-time">2º TEMPO<br>85:00</div>
+            <div class="team-box" style="justify-content: flex-end;">
+                <span id="score-arg" class="score-num">0</span>
+                <span class="team-name">ARG</span>
+                <span style="font-size: 24px;">🇦🇷</span>
+            </div>
         </div>
-        
-        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:10px; margin-bottom:15px; border:1px solid #2ecc71;">
-            <span style="color:#2ecc71; font-weight:bold; font-size:20px;">SALDO: <span id="bal-ltc">0.00000</span> LTC</span>
+
+        <button id="mode-btn" class="mode-toggle" onclick="toggleMode()">MODO: GRÁTIS 🎮</button>
+
+        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:10px; margin-bottom:15px; border:1px solid #2ecc71; display: flex; justify-content: space-around;">
+            <span style="color:#ff4444; font-weight:bold;">VIDAS: <span id="lives">5</span></span>
+            <span style="color:#2ecc71; font-weight:bold;">SALDO: <span id="bal-ltc">0.00000</span> LTC</span>
         </div>
 
         <div class="field">
+            <div id="stadium-stands" class="stadium-stands"></div>
             <div class="goal"></div>
             <div id="goalkeeper" class="goalkeeper">
-                <div class="gk-head"></div>
+                <div style="width:25px; height:25px; background:#ffe0bd; border-radius:50%; margin:0 auto;"></div>
                 <div class="gk-body"></div>
-            </div>
-            <div id="player-char" class="player">
-                <div class="pl-head"></div>
-                <div class="pl-body"></div>
             </div>
             <div id="ball" class="ball"></div>
         </div>
 
-        <div id="message" style="height:50px; font-weight:900; font-size:32px; text-shadow: 2px 2px #000;"></div>
+        <div id="message" style="height:45px; font-weight:900; font-size:28px; margin:10px 0;"></div>
 
         <div class="controls">
             <button onclick="shoot('left')">ESQUERDA</button>
@@ -162,27 +135,8 @@
             <button onclick="shoot('right')">DIREITA</button>
         </div>
 
-        <button onclick="openSmartLink()" class="bonus-btn">🎁 GANHAR +5 VIDAS GRÁTIS</button>
+        <button onclick="window.open('https://www.effectivecpmnetwork.com/fdd2jqkg?key=050a9b29a9d3d604da9295925df8ca6c', '_blank'); lives=5; updateDisplay();" style="width:100%; padding:20px; background:linear-gradient(45deg, #00c853, #b2ff59); border:none; border-radius:15px; font-weight:900; color:white; margin-top:15px; cursor:pointer;">🎁 +5 VIDAS GRÁTIS</button>
 
-        <!-- AREA DE SAQUE -->
-        <div style="background: rgba(0,0,0,0.5); padding: 20px; border-radius: 15px; margin-top: 20px; border: 1px solid #2ecc71;">
-            <input type="text" id="fp-address" placeholder="Seu E-mail FaucetPay" style="width:100%; padding:15px; border-radius:10px; border:none; text-align:center; margin-bottom: 10px; font-size:18px;">
-            <button onclick="requestWithdraw()" style="width:100%; padding:15px; background:#2ecc71; color:white; border:none; border-radius:10px; font-weight:900; font-size:18px;">SACAR MEUS LTC</button>
-            <button onclick="generateRefLink()" style="width:100%; margin-top:10px; background:#f39c12; color:white; border:none; padding:12px; border-radius:10px; font-weight:bold;">LINK DE SÓCIO 10% 🔗</button>
-            <div id="ref-link-display" style="display:none; margin-top:10px; font-size:11px; color:#2ecc71; word-break:break-all; background:rgba(0,0,0,0.5); padding:15px; border-radius:10px;"></div>
-        </div>
-
-        <!-- PROVA SOCIAL (FIXA + DINÂMICA) -->
-        <div style="margin-top:20px; background:rgba(0,0,0,0.5); padding:15px; border-radius:15px;">
-            <h4 style="color:#2ecc71; margin-bottom:10px;">🟢 PAGAMENTOS AO VIVO</h4>
-            <div id="payouts-list" style="font-size:14px;">
-                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);"><span>wi***@gmail.com</span><span style="color:#2ecc71; font-weight:bold;">0.00520 LTC ✅</span></div>
-                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);"><span>ga***@faucetpay</span><span style="color:#2ecc71; font-weight:bold;">0.00740 LTC ✅</span></div>
-                <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid rgba(255,255,255,0.05);"><span>mc***@outlook.com</span><span style="color:#2ecc71; font-weight:bold;">0.00310 LTC ✅</span></div>
-            </div>
-        </div>
-
-        <!-- RODAPÉ SOLICITADO -->
         <div class="footer-credits">
             Produzido por: <strong>GAMONIX</strong><br>
             © Todos os Direitos Reservados
@@ -190,24 +144,40 @@
     </div>
 
     <script>
-        let goals = 0;
+        let goalsBra = 0;
+        let goalsArg = 0;
+        let isPaidMode = false;
         let lives = parseInt(localStorage.getItem('pp_lives')) || 5;
         let balance = parseFloat(localStorage.getItem('pp_balance')) || 0;
 
-        // ÁUDIOS DE TRILHA E EFEITOS
-        const bgMusic = new Audio('https://www.soundjay.com/free-music/sounds/action-game-theme-01.mp3');
-        bgMusic.loop = true; bgMusic.volume = 0.3;
-        const goalSound = new Audio('https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3');
-        const saveSound = new Audio('https://www.soundjay.com/misc/sounds/fail-trombone-01.mp3');
+        const sndApito = new Audio('apito.mp3');
+        const sndTorcida = new Audio('torcida.mp3');
+        const sndGol = new Audio('gol.mp3');
+        const sndDefesa = new Audio('defesa.mp3');
+        sndTorcida.loop = true; sndTorcida.volume = 0.3;
+
+        const stands = document.getElementById('stadium-stands');
+        for(let i=0; i<40; i++) {
+            const f = document.createElement('div'); f.className = 'fan';
+            stands.appendChild(f);
+        }
+
+        function toggleMode() {
+            isPaidMode = !isPaidMode;
+            const btn = document.getElementById('mode-btn');
+            btn.innerText = isPaidMode ? "MODO: PAGO 💰" : "MODO: GRÁTIS 🎮";
+            btn.classList.toggle('paid', isPaidMode);
+        }
 
         function startGame() { 
             document.getElementById('start-overlay').style.display = 'none'; 
-            bgMusic.play().catch(()=>{});
+            sndApito.play().catch(()=>{}); sndTorcida.play().catch(()=>{});
             updateDisplay();
         }
 
         function updateDisplay() {
-            document.getElementById('goals').innerText = goals;
+            document.getElementById('score-bra').innerText = goalsBra;
+            document.getElementById('score-arg').innerText = goalsArg;
             document.getElementById('lives').innerText = lives;
             document.getElementById('bal-ltc').innerText = balance.toFixed(5);
             localStorage.setItem('pp_lives', lives);
@@ -215,57 +185,42 @@
         }
 
         function shoot(dir) {
-            if (lives <= 0) { alert("Use o bônus!"); return; }
+            if (lives <= 0) { alert("Assista ao anúncio para vidas!"); return; }
             const ball = document.getElementById('ball');
             const gk = document.getElementById('goalkeeper');
             const msg = document.getElementById('message');
-            const player = document.getElementById('player-char');
+            const stands = document.getElementById('stadium-stands');
 
             let pIdx = dir === 'left' ? 1 : dir === 'center' ? 2 : 3;
             let gkIdx = Math.floor(Math.random() * 3) + 1;
 
-            player.style.transform = `translateX(-50%) scale(1.1) ${pIdx === 1 ? 'rotate(-15deg)' : pIdx === 3 ? 'rotate(15deg)' : ''}`;
-
-            ball.style.transition = 'all 0.5s ease-out';
-            if(pIdx === 1) ball.style.left = '25%';
-            if(pIdx === 2) ball.style.left = '50%';
-            if(pIdx === 3) ball.style.left = '75%';
-            ball.style.bottom = '310px';
+            ball.style.bottom = '300px';
+            ball.style.left = pIdx === 1 ? '25%' : pIdx === 2 ? '50%' : '75%';
             ball.style.transform = 'scale(0.5) translateX(-50%)';
 
-            if(gkIdx === 1) gk.style.left = '25%';
-            if(gkIdx === 2) gk.style.left = '50%';
-            if(gkIdx === 3) gk.style.left = '75%';
+            gk.style.left = gkIdx === 1 ? '25%' : gkIdx === 2 ? '50%' : '75%';
 
             setTimeout(() => {
                 if (pIdx === gkIdx) {
-                    lives--; msg.innerText = "DEFENDEU! 🧤"; msg.style.color = "#ff4444"; saveSound.play().catch(()=>{});
+                    lives--; goalsArg++; 
+                    msg.innerText = "Aah! DEFENDEU! 🧤"; msg.style.color = "#ff4444";
+                    sndDefesa.play().catch(()=>{});
                 } else {
-                    goals++; balance += 0.00001; msg.innerText = "GOOOOOL! ⚽"; msg.style.color = "#2ecc71"; goalSound.play().catch(()=>{});
+                    goalsBra++; 
+                    balance += isPaidMode ? 0.00010 : 0.00001;
+                    msg.innerText = "GOOOOOL! ⚽"; msg.style.color = "#2ecc71";
+                    sndGol.play().catch(()=>{});
+                    stands.classList.add('celebrate');
+                    setTimeout(() => stands.classList.remove('celebrate'), 2000);
                 }
                 updateDisplay();
                 setTimeout(() => {
-                    ball.style.transition = 'none'; ball.style.bottom = '50px'; ball.style.left = '50%';
+                    ball.style.bottom = '40px'; ball.style.left = '50%';
                     ball.style.transform = 'scale(1) translateX(-50%)'; gk.style.left = '50%';
-                    player.style.transform = 'translateX(-50%)'; msg.innerText = "";
+                    msg.innerText = "";
                 }, 1000);
             }, 500);
         }
-
-        function generateRefLink() {
-            const addr = document.getElementById('fp-address').value;
-            if(!addr) { alert("Digite seu e-mail FaucetPay!"); return; }
-            const link = window.location.origin + window.location.pathname + "?ref=" + encodeURIComponent(addr);
-            const disp = document.getElementById('ref-link-display');
-            disp.innerText = link; disp.style.display = 'block';
-            navigator.clipboard.writeText(link); alert("Link de Sócio Copiado!");
-        }
-
-        function requestWithdraw() { alert("Processando saque para sua FaucetPay..."); }
-        function openSmartLink() { window.open("https://www.effectivecpmnetwork.com/fdd2jqkg?key=050a9b29a9d3d604da9295925df8ca6c", "_blank"); lives = 5; updateDisplay(); }
     </script>
-
-    <!-- ADS -->
-    <script src="https://pl29728454.effectivecpmnetwork.com/86/78/6b/86786b43564a0e90e9e6615bbf17aa8c.js"></script>
 </body>
 </html>
