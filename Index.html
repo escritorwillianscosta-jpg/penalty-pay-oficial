@@ -3,264 +3,235 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Penalty Pay Ultra Pro | GaMonix</title>
+    <title>Penalty Pay Oficial | GaMonix</title>
     <style>
         * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
-        body {
-            font-family: 'Arial Black', sans-serif;
-            background: #000; color: white; display: flex; justify-content: center; min-height: 100vh;
+        body { font-family: 'Arial', sans-serif; background: #000; color: #fff; overflow: hidden; }
+
+        .game-wrapper {
+            width: 100vw; height: 100vh; display: flex; flex-direction: column;
+            background: #001a33; padding: 10px;
         }
 
-        .game-container {
-            width: 100%; max-width: 450px; background: #001a33; border: 3px solid #ffdf00;
-            padding: 10px; position: relative; overflow: hidden; display: flex; flex-direction: column;
+        /* PLACAR */
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #000; border: 2px solid #ffdf00; border-radius: 12px;
+            padding: 8px 15px; margin-bottom: 8px;
+        }
+        .score { font-size: 22px; font-weight: bold; color: #ffdf00; }
+
+        /* ESTÁDIO */
+        .stadium-field {
+            flex: 1; background: #228b22; border: 3px solid #fff; border-radius: 15px;
+            position: relative; overflow: hidden;
+            background-image: linear-gradient(to bottom, #1a5e1a 0%, #2e7d32 100%);
         }
 
-        /* PLACAR ESTILO LED */
-        .scoreboard {
-            background: #111; border: 2px solid #444; border-radius: 8px;
-            display: flex; justify-content: space-between; padding: 10px; margin-bottom: 10px;
+        /* TORCIDA REALISTA (SVG Pattern) */
+        .crowd-bg {
+            height: 60px; width: 100%; background: #111;
+            background-image: radial-gradient(circle, #fed330 20%, transparent 20%), radial-gradient(circle, #2ecc71 20%, transparent 20%);
+            background-size: 10px 10px; background-position: 0 0, 5px 5px; opacity: 0.8;
         }
-        .score-val { color: #ffdf00; font-size: 24px; font-family: monospace; font-weight: bold; }
+        @keyframes cheer { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.1); } }
+        .goal-active .crowd-bg { animation: cheer 0.2s infinite; }
 
-        /* CAMPO COM PERSPECTIVA */
-        .field {
-            background: #1b5e20; height: 400px; position: relative; border-radius: 10px;
-            border: 3px solid rgba(255,255,255,0.5); overflow: hidden;
-            background-image: linear-gradient(to bottom, #1b5e20 50%, #2e7d32 100%);
-        }
-
-        /* TORCIDA REALISTA */
-        .stands {
-            height: 60px; background: #000; display: flex; flex-wrap: wrap; 
-            justify-content: center; align-items: flex-end; gap: 2px;
-        }
-        .fan { width: 8px; height: 12px; background: #ffdf00; border-radius: 2px; }
-        .fan:nth-child(even) { background: #2ecc71; }
-        @keyframes fanJump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-        .goal-celebration .fan { animation: fanJump 0.3s infinite; }
-
-        /* GOL 3D REALISTA */
-        .goal-area {
+        /* GOL */
+        .goal-net {
             position: absolute; top: 60px; left: 50%; transform: translateX(-50%);
-            width: 240px; height: 110px; z-index: 5;
-        }
-        .goal-frame { 
-            position: absolute; width: 100%; height: 100%; border: 6px solid #fff; 
-            border-bottom: none; z-index: 10; box-shadow: 0 0 15px rgba(255,255,255,0.5);
-        }
-        .net-3d {
-            position: absolute; width: 100%; height: 100%;
-            background: repeating-linear-gradient(transparent, transparent 7px, rgba(255,255,255,0.2) 8px),
-                        repeating-linear-gradient(90deg, transparent, transparent 7px, rgba(255,255,255,0.2) 8px);
-            background-color: rgba(255,255,255,0.05); transform: perspective(100px) rotateX(10deg);
+            width: 200px; height: 90px; border: 5px solid #fff; border-bottom: none;
+            background: rgba(255,255,255,0.1); z-index: 5;
         }
 
-        /* BOLA CLÁSSICA (SITE OFICIAL) */
-        .ball {
-            width: 36px; height: 36px; background: #fff; border-radius: 50%;
-            position: absolute; bottom: 40px; left: 50%; transform: translateX(-50%);
-            z-index: 30; box-shadow: 0 5px 10px rgba(0,0,0,0.5);
-            background-image: 
-                radial-gradient(circle at 50% 50%, #222 15%, transparent 16%),
-                radial-gradient(circle at 10% 30%, #222 12%, transparent 13%),
-                radial-gradient(circle at 90% 30%, #222 12%, transparent 13%),
-                radial-gradient(circle at 30% 85%, #222 12%, transparent 13%),
-                radial-gradient(circle at 70% 85%, #222 12%, transparent 13%);
+        /* JOGADOR DO BRASIL (SVG) */
+        .brazil-player {
+            position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%);
+            width: 80px; height: 100px; z-index: 40;
         }
-
-        /* JOGADOR BRASIL */
-        .player-brazil {
-            position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);
-            width: 60px; height: 100px; z-index: 35;
-        }
-        .shirt { width: 35px; height: 50px; background: #fed330; margin: 0 auto; border-radius: 5px; border-top: 4px solid #2ecc71; }
-        .shorts { width: 35px; height: 15px; background: #00468e; margin: -2px auto; }
 
         /* GOLEIRO */
-        .goalkeeper {
-            position: absolute; top: 145px; left: 50%; transform: translate(-50%, -50%);
-            width: 50px; height: 80px; z-index: 20; transition: 0.3s cubic-bezier(0.1, 0.7, 1.0, 0.1);
+        .gk {
+            position: absolute; top: 130px; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 80px; z-index: 20; transition: 0.3s ease-out;
         }
-        .gk-shirt { width: 35px; height: 50px; background: #00d2ff; margin: 0 auto; border-radius: 5px; }
 
-        /* FEED DE PAGAMENTOS */
-        .payouts {
-            background: rgba(0,0,0,0.8); border: 1px solid #2ecc71; border-radius: 10px;
-            margin-top: 10px; padding: 10px; height: 90px; overflow: hidden;
+        /* BOLA CLÁSSICA (SVG) */
+        .soccer-ball {
+            position: absolute; bottom: 70px; left: 50%; transform: translateX(-50%);
+            width: 40px; height: 40px; z-index: 50; transition: 0.5s;
         }
-        .payout-row { font-size: 12px; color: #2ecc71; display: flex; justify-content: space-between; margin-bottom: 5px; animation: fadeInUp 0.5s; }
+
+        /* BOTÃO BÔNUS */
+        .btn-pay {
+            width: 100%; padding: 18px; background: #2ecc71; border: none;
+            border-radius: 12px; color: #fff; font-size: 20px; font-weight: bold;
+            margin-top: 10px; box-shadow: 0 6px #1b5e20;
+        }
+
+        /* PROVAS DE PAGAMENTO */
+        .payout-area {
+            height: 70px; background: rgba(0,0,0,0.6); margin-top: 8px;
+            border-radius: 10px; padding: 5px; font-size: 11px; overflow: hidden;
+        }
+        .pay-item { display: flex; justify-content: space-between; color: #2ecc71; margin-bottom: 3px; animation: fadeInUp 0.5s; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .bonus-btn {
-            background: linear-gradient(45deg, #2ecc71, #27ae60); border: none; border-radius: 10px;
-            padding: 15px; color: white; font-weight: bold; font-size: 18px; margin-top: 10px; cursor: pointer;
-        }
-
-        #overlay {
-            position: fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9);
-            z-index: 1000; display: flex; flex-direction: column; justify-content: center; align-items: center;
+        #start-modal {
+            position: fixed; inset: 0; background: #000; z-index: 1000;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
         }
     </style>
 </head>
 <body>
 
-    <div id="overlay">
-        <h1 style="color:#ffdf00; margin-bottom:20px;">PENALTY PAY 🏆</h1>
-        <button onclick="initGame()" style="padding:20px 60px; background:#2ecc71; border:none; border-radius:50px; color:white; font-size:24px; font-weight:bold;">JOGAR AGORA!</button>
+    <div id="start-modal">
+        <h1 style="color:#ffdf00; margin-bottom: 30px; font-size: 35px;">PENALTY PAY 🏆</h1>
+        <button onclick="initGame()" style="padding: 20px 60px; background:#2ecc71; color:white; border:none; border-radius:50px; font-size:22px; font-weight:bold;">JOGAR AGORA!</button>
     </div>
 
-    <div class="game-container">
-        <div class="scoreboard">
-            <div>🇧🇷 <span id="s-bra" class="score-val">0</span></div>
-            <div style="font-size:10px; color:#666;">GAMONIX OFICIAL</div>
-            <div><span id="s-arg" class="score-val">0</span> 🇦🇷</div>
+    <div class="game-wrapper">
+        <div class="top-bar">
+            <div class="score">🇧🇷 <span id="br-score">0</span></div>
+            <div style="text-align:center; font-size:11px;">
+                <div style="color:#ff4444;">VIDAS: <span id="lives-count">5</span></div>
+                <div style="color:#2ecc71;">LTC: <span id="balance-count">0.00000</span></div>
+            </div>
+            <div class="score"><span id="ar-score">0</span> 🇦🇷</div>
         </div>
 
-        <div style="display:flex; justify-content: space-around; margin-bottom: 10px; font-size: 14px;">
-            <span style="color:#ff4444;">❤️ VIDAS: <span id="v-lives">5</span></span>
-            <span style="color:#2ecc71;">💰 LTC: <span id="v-bal">0.00000</span></span>
-        </div>
-
-        <div id="campo" class="field" onclick="handleChute(event)">
-            <div id="torcida" class="stands"></div>
+        <div class="stadium-field" id="field" onclick="handleTouch(event)">
+            <div class="crowd-bg" id="crowd"></div>
+            <div class="goal-net"></div>
             
-            <div class="goal-area">
-                <div id="trave" class="goal-frame"></div>
-                <div id="rede" class="net-3d"></div>
+            <!-- GOLEIRO -->
+            <div class="gk" id="goalkeeper">
+                <svg width="60" height="80" viewBox="0 0 60 80">
+                    <circle cx="30" cy="15" r="12" fill="#ffe0bd"/>
+                    <rect x="10" y="27" width="40" height="50" rx="5" fill="#00d2ff"/>
+                </svg>
             </div>
 
-            <div id="goleiro" class="goalkeeper">
-                <div style="width:20px; height:20px; background:#ffe0bd; border-radius:50%; margin:0 auto;"></div>
-                <div class="gk-shirt"></div>
+            <!-- JOGADOR DO BRASIL (Sempre visível) -->
+            <div class="brazil-player">
+                <svg width="80" height="100" viewBox="0 0 80 100">
+                    <circle cx="40" cy="15" r="12" fill="#ffe0bd"/>
+                    <rect x="20" y="27" width="40" height="50" rx="5" fill="#fed330"/>
+                    <rect x="20" y="77" width="40" height="15" fill="#00468e"/>
+                    <text x="40" y="60" font-size="20" fill="#2ecc71" text-anchor="middle" font-weight="bold">10</text>
+                </svg>
             </div>
 
-            <div id="jogador" class="player-brazil">
-                <div style="width:20px; height:20px; background:#ffe0bd; border-radius:50%; margin:0 auto;"></div>
-                <div class="shirt"></div>
-                <div class="shorts"></div>
+            <!-- BOLA CLÁSSICA (SVG) -->
+            <div class="soccer-ball" id="ball">
+                <svg viewBox="0 0 100 100" width="40" height="40">
+                    <circle cx="50" cy="50" r="48" fill="#fff" stroke="#000" stroke-width="2"/>
+                    <path d="M50 2 L65 35 L98 40 L75 65 L80 98 L50 80 L20 98 L25 65 L2 40 L35 35 Z" fill="#000"/>
+                </svg>
             </div>
-
-            <div id="bola" class="ball"></div>
         </div>
 
-        <div id="status-msg" style="height:30px; margin-top:10px; color:#ffdf00; font-size:20px; text-align:center;"></div>
+        <div id="status-text" style="text-align:center; height:30px; font-size:22px; color:#ffdf00; margin-top:10px; font-weight:bold;"></div>
 
-        <button onclick="window.open('https://www.effectivecpmnetwork.com/fdd2jqkg?key=050a9b29a9d3d604da9295925df8ca6c', '_blank'); lives=5; updateUI();" class="bonus-btn">BÔNUS (MAIS VIDAS)</button>
+        <button class="btn-pay" onclick="window.open('https://www.effectivecpmnetwork.com/fdd2jqkg?key=050a9b29a9d3d604da9295925df8ca6c'); lives=5; refresh();">BÔNUS (VIDAS)</button>
 
-        <div class="payouts">
-            <div style="font-size:10px; color:#aaa; margin-bottom:5px;">PAGAMENTOS AO VIVO:</div>
-            <div id="pay-feed"></div>
-        </div>
+        <div class="payout-area" id="pay-feed"></div>
 
-        <div style="text-align:center; font-size:10px; color:#444; margin-top:10px;">Produzido por: GAMONIX © Todos os Direitos Reservados</div>
+        <p style="font-size:9px; text-align:center; margin-top:8px; color:#666;">Produzido por: GAMONIX © Todos os Direitos Reservados</p>
     </div>
 
     <script>
-        let goals = 0; let misses = 0; let lives = 5; let balance = 0;
-        let isMoving = false;
-        
+        let lives = 5, balance = 0, br = 0, ar = 0, locking = false;
         const sndGol = new Audio('gol.mp3');
         const sndDef = new Audio('defesa.mp3');
-        const sndApito = new Audio('apito.mp3');
 
         function initGame() {
-            document.getElementById('overlay').style.display = 'none';
-            sndApito.play().catch(()=>{});
-            updateUI();
-            startFeed();
+            document.getElementById('start-modal').style.display = 'none';
+            refresh();
+            setInterval(createPayment, 3000);
         }
 
-        // Criar torcida
-        const t = document.getElementById('torcida');
-        for(let i=0; i<60; i++) { t.innerHTML += '<div class="fan"></div>'; }
-
-        function updateUI() {
-            document.getElementById('s-bra').innerText = goals;
-            document.getElementById('s-arg').innerText = misses;
-            document.getElementById('v-lives').innerText = lives;
-            document.getElementById('v-bal').innerText = balance.toFixed(5);
+        function refresh() {
+            document.getElementById('lives-count').innerText = lives;
+            document.getElementById('balance-count').innerText = balance.toFixed(5);
+            document.getElementById('br-score').innerText = br;
+            document.getElementById('ar-score').innerText = ar;
         }
 
-        function startFeed() {
+        function createPayment() {
             const f = document.getElementById('pay-feed');
-            setInterval(() => {
-                const user = "user_" + Math.floor(Math.random()*999) + "***";
-                const val = (Math.random() * 0.005).toFixed(5);
-                const row = `<div class="payout-row"><span>\({user}</span><span>\){val} LTC ✅</span></div>`;
-                f.innerHTML = row + f.innerHTML;
-                if(f.children.length > 3) f.lastChild.remove();
-            }, 3000);
+            const item = document.createElement('div');
+            item.className = 'pay-row';
+            item.style.display = "flex"; item.style.justifyContent = "space-between"; item.style.color = "#2ecc71";
+            item.innerHTML = `<span>user_\({Math.floor(Math.random()*999)}***</span><span>\){(Math.random()*0.005).toFixed(5)} LTC ✅</span>`;
+            f.prepend(item);
+            if(f.children.length > 3) f.lastChild.remove();
         }
 
-        function handleChute(e) {
-            if(isMoving || lives <= 0) {
-                if(lives <= 0) alert("Clica em Bônus para carregar vidas!");
+        function handleTouch(e) {
+            if(locking) return;
+            if(lives <= 0) {
+                document.getElementById('status-text').innerText = "Clica em BÔNUS!";
+                document.getElementById('status-text').style.color = "#ff4444";
                 return;
             }
-            
-            const field = document.getElementById('campo');
-            const rect = field.getBoundingClientRect();
-            const x = (e.clientX || e.touches[0].clientX) - rect.left;
-            const w = rect.width;
-            
-            let dir = x < w/3 ? 'L' : x > (w/3)*2 ? 'R' : 'C';
-            isMoving = true;
-            chutar(dir);
-        }
 
-        function chutar(dir) {
-            const bola = document.getElementById('bola');
-            const gk = document.getElementById('goleiro');
-            const msg = document.getElementById('status-msg');
-            const pl = document.getElementById('jogador');
+            locking = true;
+            const b = document.getElementById('ball');
+            const g = document.getElementById('goalkeeper');
+            const m = document.getElementById('status-text');
+            const field = document.getElementById('field').getBoundingClientRect();
+            const x = (e.clientX || e.touches[0].clientX) - field.left;
+            
+            let side = x < field.width/3 ? 'L' : x > (field.width/3)*2 ? 'R' : 'C';
+            let gkSide = ['L', 'C', 'R'][Math.floor(Math.random()*3)];
 
-            let gkDir = ['L', 'C', 'R'][Math.floor(Math.random()*3)];
+            // Pulo do Goleiro
+            g.style.left = gkSide === 'L' ? '20%' : gkSide === 'R' ? '80%' : '50%';
+
+            // Chute da Bola
+            b.style.transition = "all 0.4s ease-in";
+            b.style.left = side === 'L' ? '20%' : side === 'R' ? '80%' : '50%';
             
-            // Animação jogador
-            pl.style.transform = "translateX(-50%) translateY(-10px) scale(1.1)";
-            
-            // Física da bola
-            bola.style.transition = "all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275)";
-            let targetX = dir === 'L' ? '20%' : dir === 'R' ? '80%' : '50%';
-            
-            // SE O GOLEIRO DEFENDER, A BOLA PARA NELE!
-            let targetY = (dir === gkDir) ? "220px" : "330px";
-            
-            bola.style.bottom = targetY;
-            bola.style.left = targetX;
-            bola.style.transform = "translateX(-50%) scale(0.5) rotate(720deg)";
-            
-            // Goleiro pula
-            gk.style.left = gkDir === 'L' ? '20%' : gkDir === 'R' ? '80%' : '50%';
+            if(side === gkSide) {
+                b.style.top = "140px"; // Para na mão do goleiro
+                b.style.transform = "translateX(-50%) scale(0.4)";
+            } else {
+                b.style.top = "80px"; // Vai pro fundo do gol
+                b.style.transform = "translateX(-50%) scale(0.3)";
+            }
 
             setTimeout(() => {
-                if(dir === gkDir) {
-                    misses++; lives--; 
-                    msg.innerText = "DEFENDEU! 🧤"; msg.style.color = "#ff4444";
+                if(side === gkSide) {
+                    lives--; ar++; m.innerText = "DEFENDEU! 🧤"; m.style.color = "#ff4444";
                     sndDef.play().catch(()=>{});
-                    bola.style.zIndex = "10"; // Bola fica na mão do goleiro
+                    b.style.opacity = "0"; // Simula que o goleiro agarrou
                 } else {
-                    goals++; balance += 0.00001;
-                    msg.innerText = "GOOOOOL! ⚽"; msg.style.color = "#2ecc71";
+                    br++; balance += 0.00001; m.innerText = "GOOOOOL! ⚽"; m.style.color = "#2ecc71";
                     sndGol.play().catch(()=>{});
-                    document.getElementById('torcida').classList.add('goal-celebration');
-                    setTimeout(() => document.getElementById('torcida').classList.remove('goal-celebration'), 1500);
+                    document.getElementById('field').classList.add('goal-active');
                 }
-                updateUI();
+                refresh();
                 
                 setTimeout(() => {
-                    bola.style.transition = "none";
-                    bola.style.bottom = "40px"; bola.style.left = "50%";
-                    bola.style.transform = "translateX(-50%) scale(1)";
-                    bola.style.zIndex = "30";
-                    gk.style.left = "50%";
-                    pl.style.transform = "translateX(-50%)";
-                    msg.innerText = "";
-                    isMoving = false;
+                    b.style.transition = "none"; b.style.opacity = "1";
+                    b.style.top = "auto"; b.style.bottom = "70px"; b.style.left = "50%";
+                    b.style.transform = "translateX(-50%) scale(1)";
+                    g.style.left = "50%"; m.innerText = ""; locking = false;
+                    document.getElementById('field').classList.remove('goal-active');
                 }, 1500);
-            }, 500);
+            }, 4000); // Pequeno delay para a animação completar
+            
+            // Correção do tempo: 400ms da animação + delay
+            setTimeout(() => {}, 400); 
         }
+        
+        // Re-ajuste de tempo do setTimeout para 500ms
+        const originalTimeout = setTimeout;
+        setTimeout = function(fn, delay) {
+            if(delay === 4000) delay = 500;
+            return originalTimeout(fn, delay);
+        };
     </script>
 </body>
 </html>
