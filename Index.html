@@ -3,83 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Penalty Pay App | GaMonix 🏆</title>
+    <title>Penalty Pay Mobile | GaMonix 🏆</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        * { box-sizing: border-box; margin: 0; padding: 0; touch-action: manipulation; }
         body {
             font-family: 'Segoe UI', Tahoma, sans-serif;
             background: radial-gradient(circle at center, #004d40 0%, #00251a 100%);
             color: white; display: flex; justify-content: center; min-height: 100vh; padding: 10px;
+            overflow: hidden;
         }
 
         .game-container {
             text-align: center; background: #001a33; padding: 15px; border-radius: 20px;
             border: 4px solid #ffdf00; width: 100%; max-width: 900px; box-shadow: 0 20px 60px rgba(0,0,0,0.9);
+            position: relative;
         }
 
-        /* PLACAR LUMINOSO */
+        /* PLACAR */
         .scoreboard {
             background: #000; border: 2px solid #555; border-radius: 10px;
             display: flex; justify-content: space-between; align-items: center;
-            padding: 10px 20px; margin-bottom: 10px; box-shadow: inset 0 0 15px rgba(255,255,255,0.1);
+            padding: 10px 15px; margin-bottom: 10px;
         }
-        .team-box { display: flex; align-items: center; gap: 10px; width: 35%; }
-        .team-name { font-weight: 900; font-size: 14px; letter-spacing: 1px; }
-        .score-num { 
-            background: #222; color: #ffdf00; padding: 5px 12px; border-radius: 5px;
-            font-size: 24px; font-family: 'Courier New', Courier, monospace; border: 1px solid #444;
-        }
-        .match-time { font-size: 12px; color: #aaa; font-weight: bold; }
-
-        .mode-toggle {
-            background: #2ecc71; color: white; border: none; padding: 10px 20px;
-            border-radius: 30px; font-weight: 900; cursor: pointer; margin-bottom: 15px;
-            box-shadow: 0 4px #1b5e20;
-        }
-        .mode-toggle.paid { background: #e74c3c; box-shadow: 0 4px #922b21; }
+        .team-box { display: flex; align-items: center; gap: 8px; }
+        .score-num { background: #222; color: #ffdf00; padding: 4px 10px; border-radius: 5px; font-size: 22px; font-family: monospace; }
 
         .field {
             background: #2e7d32;
             background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.1) 0px, rgba(0,0,0,0.1) 50px, transparent 50px, transparent 100px);
-            height: 400px; position: relative; border: 4px solid white; border-radius: 10px; overflow: hidden;
+            height: 420px; position: relative; border: 4px solid white; border-radius: 10px; 
+            overflow: hidden; perspective: 1000px; cursor: pointer;
         }
 
-        .stadium-stands {
-            position: absolute; top: 0; left: 0; width: 100%; height: 50px;
-            background: #1a1a1a; display: flex; justify-content: center; gap: 4px; padding-top: 10px;
+        /* INDICAÇÃO DE TOUCH */
+        .touch-hint {
+            position: absolute; bottom: 20px; width: 100%; color: rgba(255,255,255,0.5);
+            font-size: 12px; font-weight: bold; pointer-events: none; z-index: 100;
         }
-        .fan { width: 12px; height: 18px; border-radius: 6px 6px 0 0; background: #ffdf00; }
+
+        /* TORCIDA MELHORADA */
+        .stadium-stands {
+            position: absolute; top: 0; left: 0; width: 100%; height: 60px;
+            background: #111; display: flex; justify-content: center; align-items: flex-end; gap: 6px; padding-bottom: 5px;
+        }
+        .fan { width: 12px; height: 14px; background: #ffdf00; border-radius: 3px; position: relative; }
+        .fan::after { content: ''; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; background: inherit; border-radius: 50%; }
         .fan:nth-child(even) { background: #2ecc71; }
         @keyframes jump { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
-        .celebrate .fan { animation: jump 0.4s infinite; }
+        .celebrate .fan { animation: jump 0.3s infinite; }
 
-        .goal {
-            width: 70%; height: 120px; border: 6px solid white; border-bottom: none;
-            position: absolute; top: 50px; left: 50%; transform: translateX(-50%);
-            background-image: linear-gradient(rgba(255,255,255,0.2) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.2) 1px, transparent 1px);
-            background-size: 10px 10px; z-index: 2;
+        /* GOL 3D */
+        .goal-3d { position: absolute; top: 60px; left: 50%; transform: translateX(-50%); width: 70%; height: 120px; z-index: 2; }
+        .posts { position: absolute; width: 100%; height: 100%; border: 6px solid white; border-bottom: none; z-index: 5; }
+        .net {
+            position: absolute; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(255,255,255,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.3) 1px, transparent 1px);
+            background-size: 12px 12px; background-color: rgba(255,255,255,0.05); transition: 0.2s;
         }
+        .goal-impact .net { transform: scale(1.1); background-color: rgba(255,255,255,0.2); }
 
         .goalkeeper {
-            position: absolute; top: 135px; left: 50%; transform: translate(-50%, -50%);
-            width: 60px; height: 90px; transition: all 0.3s ease; z-index: 10;
+            position: absolute; top: 145px; left: 50%; transform: translate(-50%, -50%);
+            width: 55px; height: 85px; z-index: 10; transition: 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .gk-body { width: 40px; height: 55px; background: linear-gradient(90deg, #74b9ff, #fff); margin: 0 auto; border-radius: 8px; }
 
         .ball {
-            width: 35px; height: 35px; background: white; border-radius: 50%; position: absolute;
+            width: 40px; height: 40px; background: white; border-radius: 50%; position: absolute;
             bottom: 40px; left: 50%; transform: translateX(-50%);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 15; transition: all 0.5s ease-out;
+            background: radial-gradient(circle at 30% 30%, #fff, #888);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5); z-index: 15;
         }
 
-        .controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 15px; }
-        .controls button {
-            background: linear-gradient(#ffdf00, #d4ac0d); border: none; padding: 18px 5px;
-            border-radius: 15px; font-weight: 900; cursor: pointer; box-shadow: 0 5px #997d00;
-        }
-
-        .footer-credits { margin-top: 25px; padding: 15px; font-size: 13px; color: #aaa; border-top: 1px solid rgba(255,255,255,0.1); }
-        .footer-credits strong { color: #ffdf00; }
+        .payouts-section { margin-top: 15px; background: rgba(0,0,0,0.5); padding: 12px; border-radius: 15px; border: 1px solid #2ecc71; }
+        .payout-item { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; }
 
         #start-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -90,89 +86,78 @@
 <body>
 
     <div id="start-overlay">
-        <h1 style="color:#ffdf00; font-size: 45px;">PENALTY PAY 🏆</h1>
-        <button onclick="startGame()" style="background:#2ecc71; color:white; padding:20px 60px; border:none; border-radius:50px; font-weight:900; cursor:pointer; font-size:24px; margin-top:20px;">COMEÇAR PARTIDA! ⚽</button>
+        <h1 style="color:#ffdf00; font-size: 40px;">PENALTY PAY 🏆</h1>
+        <p style="color:white; margin: 10px 0;">Toque no campo para chutar!</p>
+        <button onclick="startGame()" style="background:#2ecc71; color:white; padding:20px 50px; border:none; border-radius:50px; font-weight:900; cursor:pointer; font-size:22px; margin-top:20px;">JOGAR AGORA!</button>
     </div>
 
     <div class="game-container">
-        <!-- PLACAR OFICIAL -->
         <div class="scoreboard">
-            <div class="team-box">
-                <span style="font-size: 24px;">🇧🇷</span>
-                <span class="team-name">BRA</span>
-                <span id="score-bra" class="score-num">0</span>
-            </div>
-            <div class="match-time">2º TEMPO<br>85:00</div>
-            <div class="team-box" style="justify-content: flex-end;">
-                <span id="score-arg" class="score-num">0</span>
-                <span class="team-name">ARG</span>
-                <span style="font-size: 24px;">🇦🇷</span>
-            </div>
+            <div class="team-box"><span>🇧🇷</span> <span id="score-bra" class="score-num">0</span></div>
+            <div style="font-size:11px; color:#aaa;">TRANSF. AO VIVO</div>
+            <div class="team-box"><span id="score-arg" class="score-num">0</span> <span>🇦🇷</span></div>
         </div>
 
-        <button id="mode-btn" class="mode-toggle" onclick="toggleMode()">MODO: GRÁTIS 🎮</button>
-
-        <div style="background:rgba(0,0,0,0.3); padding:10px; border-radius:10px; margin-bottom:15px; border:1px solid #2ecc71; display: flex; justify-content: space-around;">
-            <span style="color:#ff4444; font-weight:bold;">VIDAS: <span id="lives">5</span></span>
-            <span style="color:#2ecc71; font-weight:bold;">SALDO: <span id="bal-ltc">0.00000</span> LTC</span>
+        <div style="background:rgba(0,0,0,0.3); padding:8px; border-radius:10px; margin-bottom:10px; display: flex; justify-content: space-around; font-size: 14px;">
+            <span style="color:#ff4444; font-weight:bold;">❤️ VIDAS: <span id="lives">5</span></span>
+            <span style="color:#2ecc71; font-weight:bold;">💰 LTC: <span id="bal-ltc">0.00000</span></span>
         </div>
 
-        <div class="field">
+        <!-- CAMPO TOUCH -->
+        <div id="game-field" class="field" onclick="handleTouch(event)">
             <div id="stadium-stands" class="stadium-stands"></div>
-            <div class="goal"></div>
-            <div id="goalkeeper" class="goalkeeper">
-                <div style="width:25px; height:25px; background:#ffe0bd; border-radius:50%; margin:0 auto;"></div>
-                <div class="gk-body"></div>
+            <div class="touch-hint">⬅️ TOQUE PARA ESQUERDA | CENTRO | DIREITA ➡️</div>
+            
+            <div id="goal-container" class="goal-3d">
+                <div class="posts"></div>
+                <div class="net"></div>
             </div>
+
+            <div id="goalkeeper" class="goalkeeper">
+                <div style="width:22px; height:22px; background:#ffe0bd; border-radius:50%; margin:0 auto;"></div>
+                <div style="width:38px; height:55px; background:linear-gradient(90deg, #74b9ff, #fff); margin:0 auto; border-radius:5px;"></div>
+            </div>
+            
             <div id="ball" class="ball"></div>
         </div>
 
-        <div id="message" style="height:45px; font-weight:900; font-size:28px; margin:10px 0;"></div>
+        <div id="message" style="height:35px; font-weight:900; font-size:24px; margin-top:10px; text-shadow: 2px 2px #000;"></div>
 
-        <div class="controls">
-            <button onclick="shoot('left')">ESQUERDA</button>
-            <button onclick="shoot('center')">CENTRO</button>
-            <button onclick="shoot('right')">DIREITA</button>
+        <!-- BOTÃO DE BÔNUS -->
+        <button onclick="window.open('https://www.effectivecpmnetwork.com/fdd2jqkg?key=050a9b29a9d3d604da9295925df8ca6c', '_blank'); lives=5; updateDisplay();" style="width:100%; padding:15px; background:linear-gradient(45deg, #00c853, #b2ff59); border:none; border-radius:12px; font-weight:900; color:white; margin-top:10px; cursor:pointer;">🎁 +5 VIDAS GRÁTIS</button>
+
+        <div class="payouts-section">
+            <h4 style="color:#2ecc71; margin-bottom:8px; font-size:13px;">🟢 PAGAMENTOS AO VIVO</h4>
+            <div class="payout-item"><span>wi***@gmail.com</span><span style="color:#2ecc71;">0.00520 LTC ✅</span></div>
+            <div class="payout-item"><span>ga***@faucetpay</span><span style="color:#2ecc71;">0.00740 LTC ✅</span></div>
         </div>
 
-        <button onclick="window.open('https://www.effectivecpmnetwork.com/fdd2jqkg?key=050a9b29a9d3d604da9295925df8ca6c', '_blank'); lives=5; updateDisplay();" style="width:100%; padding:20px; background:linear-gradient(45deg, #00c853, #b2ff59); border:none; border-radius:15px; font-weight:900; color:white; margin-top:15px; cursor:pointer;">🎁 +5 VIDAS GRÁTIS</button>
-
-        <div class="footer-credits">
-            Produzido por: <strong>GAMONIX</strong><br>
-            © Todos os Direitos Reservados
-        </div>
+        <div style="margin-top:15px; color:#aaa; font-size:11px;">Produzido por: <strong>GAMONIX</strong></div>
     </div>
 
     <script>
-        let goalsBra = 0;
-        let goalsArg = 0;
-        let isPaidMode = false;
+        let goalsBra = 0; let goalsArg = 0;
         let lives = parseInt(localStorage.getItem('pp_lives')) || 5;
         let balance = parseFloat(localStorage.getItem('pp_balance')) || 0;
+        let isShooting = false;
 
         const sndApito = new Audio('apito.mp3');
         const sndTorcida = new Audio('torcida.mp3');
         const sndGol = new Audio('gol.mp3');
         const sndDefesa = new Audio('defesa.mp3');
-        sndTorcida.loop = true; sndTorcida.volume = 0.3;
+
+        function startGame() {
+            document.getElementById('start-overlay').style.display = 'none';
+            sndApito.play().catch(()=>{});
+            sndTorcida.loop = true; sndTorcida.volume = 0.2;
+            sndTorcida.play().catch(()=>{});
+            updateDisplay();
+        }
 
         const stands = document.getElementById('stadium-stands');
-        for(let i=0; i<40; i++) {
+        for(let i=0; i<35; i++) {
             const f = document.createElement('div'); f.className = 'fan';
             stands.appendChild(f);
-        }
-
-        function toggleMode() {
-            isPaidMode = !isPaidMode;
-            const btn = document.getElementById('mode-btn');
-            btn.innerText = isPaidMode ? "MODO: PAGO 💰" : "MODO: GRÁTIS 🎮";
-            btn.classList.toggle('paid', isPaidMode);
-        }
-
-        function startGame() { 
-            document.getElementById('start-overlay').style.display = 'none'; 
-            sndApito.play().catch(()=>{}); sndTorcida.play().catch(()=>{});
-            updateDisplay();
         }
 
         function updateDisplay() {
@@ -184,41 +169,64 @@
             localStorage.setItem('pp_balance', balance);
         }
 
+        // LÓGICA DE TOUCH SUBWAY
+        function handleTouch(e) {
+            if (isShooting || lives <= 0) return;
+            
+            const field = document.getElementById('game-field');
+            const rect = field.getBoundingClientRect();
+            const touchX = (e.clientX || e.touches[0].clientX) - rect.left;
+            const fieldWidth = rect.width;
+
+            let direction = 'center';
+            if (touchX < fieldWidth / 3) direction = 'left';
+            else if (touchX > (fieldWidth / 3) * 2) direction = 'right';
+
+            shoot(direction);
+        }
+
         function shoot(dir) {
-            if (lives <= 0) { alert("Assista ao anúncio para vidas!"); return; }
+            isShooting = true;
             const ball = document.getElementById('ball');
             const gk = document.getElementById('goalkeeper');
             const msg = document.getElementById('message');
+            const goal = document.getElementById('goal-container');
             const stands = document.getElementById('stadium-stands');
 
             let pIdx = dir === 'left' ? 1 : dir === 'center' ? 2 : 3;
             let gkIdx = Math.floor(Math.random() * 3) + 1;
 
-            ball.style.bottom = '300px';
-            ball.style.left = pIdx === 1 ? '25%' : pIdx === 2 ? '50%' : '75%';
+            ball.style.transition = 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
+            ball.style.bottom = '275px';
+            ball.style.left = pIdx === 1 ? '20%' : pIdx === 2 ? '50%' : '80%';
             ball.style.transform = 'scale(0.5) translateX(-50%)';
-
-            gk.style.left = gkIdx === 1 ? '25%' : gkIdx === 2 ? '50%' : '75%';
+            
+            gk.style.left = gkIdx === 1 ? '20%' : gkIdx === 2 ? '50%' : '80%';
 
             setTimeout(() => {
                 if (pIdx === gkIdx) {
-                    lives--; goalsArg++; 
-                    msg.innerText = "Aah! DEFENDEU! 🧤"; msg.style.color = "#ff4444";
+                    lives--; goalsArg++; msg.innerText = "Aah! DEFENDEU! 🧤"; msg.style.color = "#ff4444";
                     sndDefesa.play().catch(()=>{});
+                    ball.style.bottom = '210px'; 
+                    ball.style.transform = 'scale(0.6) translateX(-50%)';
                 } else {
-                    goalsBra++; 
-                    balance += isPaidMode ? 0.00010 : 0.00001;
-                    msg.innerText = "GOOOOOL! ⚽"; msg.style.color = "#2ecc71";
+                    goalsBra++; balance += 0.00001; msg.innerText = "GOOOOOL! ⚽"; msg.style.color = "#2ecc71";
                     sndGol.play().catch(()=>{});
+                    goal.classList.add('goal-impact');
                     stands.classList.add('celebrate');
-                    setTimeout(() => stands.classList.remove('celebrate'), 2000);
+                    setTimeout(() => {
+                        goal.classList.remove('goal-impact');
+                        stands.classList.remove('celebrate');
+                    }, 1000);
                 }
                 updateDisplay();
                 setTimeout(() => {
+                    ball.style.transition = 'none';
                     ball.style.bottom = '40px'; ball.style.left = '50%';
                     ball.style.transform = 'scale(1) translateX(-50%)'; gk.style.left = '50%';
                     msg.innerText = "";
-                }, 1000);
+                    isShooting = false;
+                }, 1200);
             }, 500);
         }
     </script>
